@@ -1,75 +1,81 @@
 
-const btnVer = async () => {
-    const contenedor = document.getElementById("producto");
-    const estado = document.getElementById("productoEstado");
-    const idProducto = document.getElementById("productoId");
-    const latencia = document.getElementById("productoLatencia");
-
+const obtenerProducto = async () => {
     const inicio = performance.now();
 
     try {
         // Elegir un producto aleatorio del 1 al 20
         const id = Math.floor(Math.random() * 20) + 1;
 
-        estado.textContent = "CARGANDO...";
-        contenedor.innerHTML = "<p>Cargando producto...</p>";
-
-        const req = await fetch(
+        const request = await fetch(
             `https://fakestoreapi.com/products/${id}`
         );
 
-        if (!req.ok) {
-            throw new Error("No se pudo consultar la API");
+        if (!request.ok) {
+            throw new Error("Error al consumir la API");
         }
 
-        const res = await req.json();
+        const response = await request.json();
+        const fin = performance.now();
 
-     
-        idProducto.textContent = "#" + res.id;
+        document.getElementById("productoId").textContent =
+            "#" + response.id;
 
-        contenedor.innerHTML = `
+        document.getElementById("productoEstado").textContent =
+            "200 OK";
+
+        document.getElementById("productoLatencia").textContent =
+            Math.round(fin - inicio) + " ms";
+
+        document.getElementById("producto").innerHTML = `
             <img
-                src="${res.image}"
-                class="producto-img mb-3"
-                alt="${res.title}"
+                src="${response.image}"
+                alt="${response.title}"
+                class="img-fluid mb-3"
+                style="max-width:180px; max-height:220px; object-fit:contain;"
             >
 
-            <h5 class="hud-value mt-3">${res.title}</h5>
+            <h5 class="hud-value mt-2">
+                ${response.title}
+            </h5>
 
-            <p class="producto-precio">
-                $${Number(res.price).toFixed(2)}
+            <h3 class="producto-precio mt-3">
+                $${Number(response.price).toFixed(2)}
+            </h3>
+
+            <p class="text-info">
+                ${response.category}
             </p>
+
+            <p>${response.description}</p>
 
             <p>
-                <strong>Categoría:</strong> ${res.category}
+                <i class="fa-solid fa-star text-warning"></i>
+                Calificación: ${response.rating.rate}/5
             </p>
 
-            <p class="producto-descripcion">
-                ${res.description}
-            </p>
-
-            <p>
-                <strong>Calificación:</strong>
-                ${res.rating.rate}/5
-                (${res.rating.count} valoraciones)
+            <p class="hud-label">
+                Opiniones registradas: ${response.rating.count}
             </p>
         `;
 
-        latencia.textContent =
-            Math.round(performance.now() - inicio) + " ms";
-
-        estado.textContent = "200 OK";
-
     } catch (error) {
-        console.error("Error al cargar productos:", error);
+        console.error("Error al consumir la API:", error);
 
-        estado.textContent = "ERROR";
+        document.getElementById("productoEstado").textContent =
+            "ERROR";
 
-        contenedor.innerHTML =
-            "<p class='text-danger'>No se pudo cargar el producto. Intenta nuevamente.</p>";
+        document.getElementById("producto").innerHTML =
+            "<p class='text-danger'>Error al cargar el producto</p>";
+
+        document.getElementById("productoLatencia").textContent =
+            "-- ms";
     }
 };
 
-document.getElementById("btnProducto").addEventListener("click", btnVer);
+// Cargar un producto al abrir la página
+document.addEventListener("DOMContentLoaded", () => {
+    obtenerProducto();
 
-btnVer();
+    document.getElementById("btnProducto")
+        .addEventListener("click", obtenerProducto);
+});
