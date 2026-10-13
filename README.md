@@ -2,6 +2,8 @@
 
 Proyecto grupal de desarrollo web. La aplicación muestra información obtenida desde APIs públicas y la presenta en una página con estilo de panel tecnológico. La idea es practicar el consumo de servicios REST, el manejo de respuestas JSON y la actualización de elementos HTML con JavaScript.
 
+LINK: https://leitom10.github.io/Laboratorio2/ 
+
 ## Participantes
 
 Juan Rodriguez
