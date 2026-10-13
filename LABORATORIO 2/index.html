@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HUD Usuario - API Practica</title>
+    <title>Visor Inteligente - Proyecto Grupal</title>
 
-    <!-- Bootstrap 5 & FontAwesome -->
+    <!-- Bootstrap 5, FontAwesome & Google Fonts -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-
 
     <style>
         :root {
@@ -27,9 +26,11 @@
             font-family: 'JetBrains Mono', monospace;
             min-height: 100vh;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 1rem;
+            padding: 2rem 1rem;
+            gap: 2rem;
             background-image: 
                 radial-gradient(circle at center, rgba(10, 28, 56, 0.6) 0%, var(--bg-dark) 90%),
                 linear-gradient(rgba(0, 242, 255, 0.03) 1px, transparent 1px),
@@ -37,7 +38,6 @@
             background-size: 100% 100%, 30px 30px, 30px 30px;
         }
 
-        /* Marco Principal HUD */
         .hud-frame {
             position: relative;
             width: 100%;
@@ -50,7 +50,6 @@
             box-shadow: 0 0 30px rgba(0, 242, 255, 0.05);
         }
 
-        /* Enmarcado de esquinas */
         .corner {
             position: absolute;
             width: 12px;
@@ -62,7 +61,15 @@
         .corner-bl { bottom: -2px; left: -2px; border-right: 0; border-top: 0; }
         .corner-br { bottom: -2px; right: -2px; border-left: 0; border-top: 0; }
 
-        /* Estilos de Texto e Interfaz */
+        .dot-online {
+            width: 10px;
+            height: 10px;
+            background-color: var(--hud-cyan);
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 8px var(--hud-cyan);
+        }
+
         .hud-header, .hud-footer {
             border-color: var(--hud-border) !important;
             font-size: 0.8rem;
@@ -88,16 +95,15 @@
             font-weight: 600;
         }
 
-        .user-avatar {
-            width: 110px;
-            height: 110px;
+        .dog-avatar {
+            width: 140px;
+            height: 140px;
             border-radius: 50%;
             border: 2px solid var(--hud-cyan);
             box-shadow: 0 0 15px rgba(0, 242, 255, 0.3);
             object-fit: cover;
         }
 
-        /* Botón estilo HUD */
         .btn-hud {
             background: rgba(0, 242, 255, 0.1);
             border: 1px solid var(--hud-cyan);
@@ -107,34 +113,36 @@
             padding: 6px 16px;
             border-radius: 4px;
             transition: all 0.2s ease;
+            cursor: pointer;
         }
         .btn-hud:hover {
             background: var(--hud-cyan);
             color: var(--bg-dark);
             font-weight: 600;
         }
+
+        .url-text {
+            font-size: 0.75rem;
+            color: var(--hud-cyan);
+            word-break: break-all;
+        }
     </style>
-    
 </head>
 <body>
 
+    <!-- ================= USUARIOS ================= -->
     <div class="hud-frame">
-        <!-- Esquinas Decorativas -->
         <div class="corner corner-tl"></div>
         <div class="corner corner-tr"></div>
         <div class="corner corner-bl"></div>
         <div class="corner corner-br"></div>
 
-        <!-- Encabezado -->
         <div class="hud-header border-bottom pb-2 mb-3 d-flex justify-content-between align-items-center">
-            <div><i class="fa-solid fa-circle text-info me-2 fs-6"></i>VISOR INTELIGENTE</div>
+            <div><i class="fa-solid fa-circle text-info me-2 fs-6"></i>VISOR INTELIGENTE - USUARIOS</div>
             <div class="opacity-75">ESTADO: ONLINE</div>
         </div>
 
-        <!-- Contenido Principal (Zona Lateral + Centro) -->
         <div class="row g-3 align-items-center my-2">
-            
-            <!-- Panel Izquierdo (Métricas estáticas/API) -->
             <div class="col-md-3 d-none d-md-block">
                 <div class="hud-card mb-2">
                     <div class="hud-label">ID CONSULTA</div>
@@ -146,18 +154,17 @@
                 </div>
             </div>
 
-            <!-- Panel Central: Información del Usuario -->
             <div class="col-md-6 text-center">
                 <div class="hud-card py-4" id="listarUser">
-                <div class="border border-gray border-1 rounded-3" id="pok-1">
-                    <img>
-                    <a href="#" class="d-block bg-secondary text-white py-1 text-decoration-none">
-                        <p class="lead"></p>
-                    </a>
+                    <div class="border border-secondary rounded-3 p-3" id="pok-1">
+                        <img src="" alt="Usuario" id="usrAvatar" class="dog-avatar mb-2">
+                        <a href="#" class="d-block bg-secondary text-white py-1 text-decoration-none rounded">
+                            <p class="lead mb-0" id="usrName">Esperando datos...</p>
+                        </a>
+                    </div>
                 </div>
             </div>
 
-            <!-- Panel Derecho (Métricas estáticas/API) -->
             <div class="col-md-3 d-none d-md-block">
                 <div class="hud-card mb-2 text-end">
                     <div class="hud-label">LATENCIA</div>
@@ -168,19 +175,136 @@
                     <div class="hud-value">JSON</div>
                 </div>
             </div>
-
         </div>
 
-        <!-- Pie de página y Control -->
         <div class="hud-footer border-top pt-3 mt-2 d-flex justify-content-between align-items-center">
-            <button class="btn-hud"  onclick="btnVer">
+            <button class="btn-hud" id="btnUser">
                 <i class="fa-solid fa-arrows-rotate me-1"></i> DATA
             </button>
             <span class="hud-label">MODO: CONSUMO DE API REST</span>
         </div>
     </div>
 
-    <script src="/carpeta2/User.js"></script>
+
+    <!-- ================= MASCOTAS ================= -->
+    <div class="hud-frame">
+    
+        <div class="corner corner-tl"></div>
+        <div class="corner corner-tr"></div>
+        <div class="corner corner-bl"></div>
+        <div class="corner corner-br"></div>
+
+        <div class="hud-header border-bottom pb-2 mb-4 d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+                <span class="dot-online me-2"></span>
+                <span class="fw-bold">VISOR INTELIGENTE - MASCOTAS</span>
+            </div>
+            <div>ESTADO: ONLINE</div>
+        </div>
+
+        <div class="row g-3 align-items-center my-2">
+            <div class="col-md-3">
+                <div class="hud-card mb-3">
+                    <div class="hud-label">ID CONSULTA</div>
+                    <div class="hud-value fs-4" id="mascotaId">#0000</div>
+                </div>
+                <div class="hud-card">
+                    <div class="hud-label">ESTADO API</div>
+                    <div class="hud-value text-success" id="mascotaEstado">ESPERANDO</div>
+                </div>
+            </div>
+
+            <div class="col-md-6 text-center">
+                <div class="hud-card py-4">
+                    <h5 class="hud-value fs-4 mb-3">DATOS DE LA API</h5>
+                    
+                    <div class="mb-3">
+                        <img src="" alt="Perro" id="mascotaImg" class="dog-avatar">
+                    </div>
+
+                    <div class="hud-label mb-2">IMAGEN OBTENIDA</div>
+                    <div class="url-text px-3" id="mascotaUrl">Esperando datos...</div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="hud-card mb-3 text-end">
+                    <div class="hud-label">LATENCIA</div>
+                    <div class="hud-value" id="mascotaLatencia">14 ms</div>
+                </div>
+                <div class="hud-card text-end">
+                    <div class="hud-label">FORMATO</div>
+                    <div class="hud-value">JSON</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="hud-footer border-top pt-3 mt-4 d-flex justify-content-between align-items-center">
+            <button class="btn-hud" id="btnData">
+                <i class="fa-solid fa-rotate me-2"></i> DATA
+            </button>
+            <span class="hud-label">MODO: CONSUMO DE API REST</span>
+        </div>
+    </div>
+    <!-- ================= PRODUCTOS ================= -->
+
+        <div class="hud-frame">
+        <div class="corner corner-tl"></div>
+        <div class="corner corner-tr"></div>
+        <div class="corner corner-bl"></div>
+        <div class="corner corner-br"></div>
+
+        <div class="hud-header border-bottom pb-2 mb-3 d-flex justify-content-between align-items-center">
+            <div><i class="fa-solid fa-circle text-info me-2 fs-6"></i>VISOR INTELIGENTE - PRODUCTOS</div>
+            <div class="opacity-75">ESTADO: ONLINE</div>
+        </div>
+
+        <div class="row g-3 align-items-center my-2">
+            <div class="col-md-3 d-none d-md-block">
+                <div class="hud-card mb-2">
+                    <div class="hud-label">ID CONSULTA</div>
+                    <div class="hud-value" id="usrId">#0000</div>
+                </div>
+                <div class="hud-card">
+                    <div class="hud-label">ESTADO API</div>
+                    <div class="hud-value text-success">200 OK</div>
+                </div>
+            </div>
+
+            <div class="col-md-6 text-center">
+                <div class="hud-card py-4" id="listarUser">
+                    <div class="border border-secondary rounded-3 p-3" id="pok-1">
+                        <img src="" alt="Usuario" id="usrAvatar" class="dog-avatar mb-2">
+                        <a href="#" class="d-block bg-secondary text-white py-1 text-decoration-none rounded">
+                            <p class="lead mb-0" id="usrName">Esperando datos...</p>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3 d-none d-md-block">
+                <div class="hud-card mb-2 text-end">
+                    <div class="hud-label">LATENCIA</div>
+                    <div class="hud-value">14 ms</div>
+                </div>
+                <div class="hud-card text-end">
+                    <div class="hud-label">FORMATO</div>
+                    <div class="hud-value">JSON</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="hud-footer border-top pt-3 mt-2 d-flex justify-content-between align-items-center">
+            <button class="btn-hud" id="btnUser">
+                <i class="fa-solid fa-arrows-rotate me-1"></i> DATA
+            </button>
+            <span class="hud-label">MODO: CONSUMO DE API REST</span>
+        </div>
+    </div>
+
+    <!-- Scripts de la aplicación -->
+    <script src="datosUsers.js"></script>
+    <script src="datosMascotas.js"></script>
 
 </body>
 </html>
